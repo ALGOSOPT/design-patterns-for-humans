@@ -72,50 +72,45 @@ Wikipedia says
 **Programmatic Example**
 
 First of all we have a door interface and the implementation
-```php
-interface Door
-{
-    public function getWidth(): float;
-    public function getHeight(): float;
+```java
+interface Door {
+    float getWidth();
+    float getHeight();
 }
 
-class WoodenDoor implements Door
-{
-    protected $width;
-    protected $height;
+class WoodenDoor implements Door {
+    protected float width;
+    protected float height;
 
-    public function __construct(float $width, float $height)
-    {
-        $this->width = $width;
-        $this->height = $height;
+    public WoodenDoor(float width, float height) {
+        this.width = width;
+        this.height = height;
     }
 
-    public function getWidth(): float
-    {
-        return $this->width;
+    @Override
+    public float getWidth() {
+        return width;
     }
 
-    public function getHeight(): float
-    {
-        return $this->height;
+    @Override
+    public float getHeight() {
+        return height;
     }
 }
 ```
 Then we have our door factory that makes the door and returns it
-```php
-class DoorFactory
-{
-    public static function makeDoor($width, $height): Door
-    {
-        return new WoodenDoor($width, $height);
+```java
+class DoorFactory {
+    public static Door makeDoor(float width, float height) {
+        return new WoodenDoor(width, height);
     }
 }
 ```
 And then it can be used as
-```php
-$door = DoorFactory::makeDoor(100, 200);
-echo 'Width: ' . $door->getWidth();
-echo 'Height: ' . $door->getHeight();
+```java
+Door door = DoorFactory.makeDoor(100, 200);
+Assert.assertEquals(door.getWidth(), 100f, 0.0f);
+Assert.assertEquals(door.getHeight(), 200f, 0.0f);
 ```
 
 **When to Use?**
@@ -138,72 +133,63 @@ Wikipedia says
 
 Taking our hiring manager example above. First of all we have an interviewer interface and some implementations for it
 
-```php
-interface Interviewer
-{
-    public function askQuestions();
+```java
+interface Interviewer {
+    String askQuestions();
 }
 
-class Developer implements Interviewer
-{
-    public function askQuestions()
-    {
-        echo 'Asking about design patterns!';
+class Developer implements Interviewer {
+    @Override
+    public String askQuestions() {
+        return "Asking about design patterns!";
     }
 }
 
-class CommunityExecutive implements Interviewer
-{
-    public function askQuestions()
-    {
-        echo 'Asking about community building';
+class CommunityExecutive implements Interviewer {
+    @Override
+    public String askQuestions() {
+        return "Asking about community building";
     }
 }
 ```
 
 Now let us create our `HiringManager`
 
-```php
-abstract class HiringManager
-{
-
+```java
+abstract class HiringManager {
     // Factory method
-    abstract protected function makeInterviewer(): Interviewer;
+    abstract protected Interviewer makeInterviewer();
 
-    public function takeInterview()
-    {
-        $interviewer = $this->makeInterviewer();
-        $interviewer->askQuestions();
+    public String takeInterview() {
+        Interviewer interviewer = this.makeInterviewer();
+        return interviewer.askQuestions();
     }
 }
 
 ```
 Now any child can extend it and provide the required interviewer
-```php
-class DevelopmentManager extends HiringManager
-{
-    protected function makeInterviewer(): Interviewer
-    {
+```java
+class DeveloperManager extends HiringManager {
+    @Override
+    protected Interviewer makeInterviewer() {
         return new Developer();
     }
 }
 
-class MarketingManager extends HiringManager
-{
-    protected function makeInterviewer(): Interviewer
-    {
+class MarketingManger extends HiringManager {
+    @Override
+    protected Interviewer makeInterviewer() {
         return new CommunityExecutive();
     }
 }
 ```
 and then it can be used as
 
-```php
-$devManager = new DevelopmentManager();
-$devManager->takeInterview(); // Output: Asking about design patterns
-
-$marketingManager = new MarketingManager();
-$marketingManager->takeInterview(); // Output: Asking about community building.
+```java
+HiringManager devManager = new DeveloperManager();
+Assert.assertEquals(devManager.takeInterview(), "Asking about design patterns!");
+HiringManager marketingManager = new MarketingManger();
+Assert.assertEquals(marketingManager.takeInterview(), "Asking about community building");
 ```
 
 **When to use?**
@@ -226,107 +212,95 @@ Wikipedia says
 
 Translating the door example above. First of all we have our `Door` interface and some implementation for it
 
-```php
-interface Door
-{
-    public function getDescription();
+```java
+interface Door {
+    String getDescription();
 }
 
-class WoodenDoor implements Door
-{
-    public function getDescription()
-    {
-        echo 'I am a wooden door';
+class WoodenDoor implements Door {
+    @Override
+    public String getDescription() {
+        return "I am a wooden door";
     }
 }
 
-class IronDoor implements Door
-{
-    public function getDescription()
-    {
-        echo 'I am an iron door';
+class IronDoor implements Door {
+    @Override
+    public String getDescription() {
+        return "I am an iron door";
     }
 }
 ```
 Then we have some fitting experts for each door type
 
-```php
-interface DoorFittingExpert
-{
-    public function getDescription();
+```java
+interface DoorFittingExpert {
+    String getDescription();
 }
 
-class Welder implements DoorFittingExpert
-{
-    public function getDescription()
-    {
-        echo 'I can only fit iron doors';
+class Welder implements DoorFittingExpert {
+    @Override
+    public String getDescription() {
+        return "I can only fit iron doors";
     }
 }
 
-class Carpenter implements DoorFittingExpert
-{
-    public function getDescription()
-    {
-        echo 'I can only fit wooden doors';
+class Carpenter implements DoorFittingExpert {
+    @Override
+    public String getDescription() {
+        return "I can only fit wooden doors";
     }
 }
 ```
 
 Now we have our abstract factory that would let us make family of related objects i.e. wooden door factory would create a wooden door and wooden door fitting expert and iron door factory would create an iron door and iron door fitting expert
 ```php
-interface DoorFactory
-{
-    public function makeDoor(): Door;
-    public function makeFittingExpert(): DoorFittingExpert;
+interface DoorFactory {
+    Door makeDoor();
+    DoorFittingExpert makeFittingExpert();
 }
 
-// Wooden factory to return carpenter and wooden door
-class WoodenDoorFactory implements DoorFactory
-{
-    public function makeDoor(): Door
-    {
+class WoodenDoorFactory implements DoorFactory {
+    @Override
+    public Door makeDoor() {
         return new WoodenDoor();
     }
 
-    public function makeFittingExpert(): DoorFittingExpert
-    {
+    @Override
+    public DoorFittingExpert makeFittingExpert() {
         return new Carpenter();
     }
 }
 
-// Iron door factory to get iron door and the relevant fitting expert
-class IronDoorFactory implements DoorFactory
-{
-    public function makeDoor(): Door
-    {
+class IronDoorFactory implements DoorFactory {
+    @Override
+    public Door makeDoor() {
         return new IronDoor();
     }
 
-    public function makeFittingExpert(): DoorFittingExpert
-    {
+    @Override
+    public DoorFittingExpert makeFittingExpert() {
         return new Welder();
     }
 }
 ```
 And then it can be used as
-```php
-$woodenFactory = new WoodenDoorFactory();
+```java
+DoorFactory woodenFactory = new WoodenDoorFactory();
 
-$door = $woodenFactory->makeDoor();
-$expert = $woodenFactory->makeFittingExpert();
+Door door = woodenFactory.makeDoor();
+DoorFittingExpert expert = woodenFactory.makeFittingExpert();
 
-$door->getDescription();  // Output: I am a wooden door
-$expert->getDescription(); // Output: I can only fit wooden doors
+Assert.assertEquals(door.getDescription(), "I am a wooden door");
+Assert.assertEquals(expert.getDescription(), "I can only fit wooden doors");
 
-// Same for Iron Factory
-$ironFactory = new IronDoorFactory();
+DoorFactory ironFactory = new IronDoorFactory();
 
-$door = $ironFactory->makeDoor();
-$expert = $ironFactory->makeFittingExpert();
+door = ironFactory.makeDoor();
+expert = ironFactory.makeFittingExpert();
 
-$door->getDescription();  // Output: I am an iron door
-$expert->getDescription(); // Output: I can only fit iron doors
+Assert.assertEquals(door.getDescription(), "I am an iron door");
+Assert.assertEquals(expert.getDescription(), "I can only fit iron doors");
 ```
 
 As you can see the wooden door factory has encapsulated the `carpenter` and the `wooden door` also iron door factory has encapsulated the `iron door` and `welder`. And thus it had helped us make sure that for each of the created door, we do not get a wrong fitting expert.   
@@ -360,82 +334,79 @@ As you can see; the number of constructor parameters can quickly get out of hand
 
 The sane alternative is to use the builder pattern. First of all we have our burger that we want to make
 
-```php
-class Burger
-{
-    protected $size;
+```java
+class Burger {
+    protected int size;
 
-    protected $cheese = false;
-    protected $pepperoni = false;
-    protected $lettuce = false;
-    protected $tomato = false;
+    protected boolean cheese = false;
+    protected boolean pepperoni = false;
+    protected boolean lettuce = false;
+    protected boolean tomato = false;
 
-    public function __construct(BurgerBuilder $builder)
-    {
-        $this->size = $builder->size;
-        $this->cheese = $builder->cheese;
-        $this->pepperoni = $builder->pepperoni;
-        $this->lettuce = $builder->lettuce;
-        $this->tomato = $builder->tomato;
+    public Burger(BurgerBuilder builder) {
+        this.size = builder.size;
+        this.cheese = builder.cheese;
+        this.pepperoni = builder.pepperoni;
+        this.lettuce = builder.lettuce;
+        this.tomato = builder.tomato;
     }
 }
 ```
 
 And then we have the builder
 
-```php
-class BurgerBuilder
-{
-    public $size;
+```java
+class BurgerBuilder {
+    public int size;
 
-    public $cheese = false;
-    public $pepperoni = false;
-    public $lettuce = false;
-    public $tomato = false;
+    public boolean cheese = false;
+    public boolean pepperoni = false;
+    public boolean lettuce = false;
+    public boolean tomato = false;
 
-    public function __construct(int $size)
-    {
-        $this->size = $size;
+    public BurgerBuilder(int size) {
+        this.size = size;
     }
 
-    public function addPepperoni()
-    {
-        $this->pepperoni = true;
-        return $this;
+    public BurgerBuilder addCheese() {
+        this.cheese = true;
+        return this;
     }
 
-    public function addLettuce()
-    {
-        $this->lettuce = true;
-        return $this;
+    public BurgerBuilder addPepperoni() {
+        this.pepperoni = true;
+        return this;
     }
 
-    public function addCheese()
-    {
-        $this->cheese = true;
-        return $this;
+    public BurgerBuilder addtLettuce() {
+        this.lettuce = true;
+        return this;
     }
 
-    public function addTomato()
-    {
-        $this->tomato = true;
-        return $this;
+    public BurgerBuilder addTomato() {
+        this.tomato = true;
+        return this;
     }
 
-    public function build(): Burger
-    {
-        return new Burger($this);
+    public Burger build() {
+        return new Burger(this);
     }
 }
 ```
 And then it can be used as:
 
-```php
-$burger = (new BurgerBuilder(14))
-                    ->addPepperoni()
-                    ->addLettuce()
-                    ->addTomato()
-                    ->build();
+```java
+Burger burger = (new BurgerBuilder(14))
+                .addPepperoni()
+                .addtLettuce()
+                .addTomato()
+                .build();
+
+Assert.assertEquals(burger.size, 14);
+Assert.assertEquals(burger.cheese, false);
+Assert.assertEquals(burger.pepperoni, true);
+Assert.assertEquals(burger.lettuce, true);
+Assert.assertEquals(burger.tomato, true);
 ```
 
 **When to use?**
@@ -459,50 +430,52 @@ In short, it allows you to create a copy of an existing object and modify it to 
 
 In PHP, it can be easily done using `clone`
 
-```php
-class Sheep
-{
-    protected $name;
-    protected $category;
+```java
+class Sheep implements Cloneable {
+    protected String name;
+    protected String category;
 
-    public function __construct(string $name, string $category = 'Mountain Sheep')
-    {
-        $this->name = $name;
-        $this->category = $category;
+    public Sheep(String name, String category) {
+        this.name = name;
+        this.category = category;
     }
 
-    public function setName(string $name)
-    {
-        $this->name = $name;
+    public String getName() {
+        return name;
     }
 
-    public function getName()
-    {
-        return $this->name;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public function setCategory(string $category)
-    {
-        $this->category = $category;
+    public String getCategory() {
+        return category;
     }
 
-    public function getCategory()
-    {
-        return $this->category;
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Sheep clone() throws CloneNotSupportedException {
+        Sheep sheep = (Sheep) super.clone();
+
+        return sheep;
     }
 }
 ```
 Then it can be cloned like below
-```php
-$original = new Sheep('Jolly');
-echo $original->getName(); // Jolly
-echo $original->getCategory(); // Mountain Sheep
+```java
+Sheep original = new Sheep("Jolly", "Mountain sheep");
 
-// Clone and modify what is required
-$cloned = clone $original;
-$cloned->setName('Dolly');
-echo $cloned->getName(); // Dolly
-echo $cloned->getCategory(); // Mountain sheep
+Assert.assertEquals(original.getName(), "Jolly");
+Assert.assertEquals(original.getCategory(), "Mountain sheep");
+
+try {
+    Sheep cloned = original.clone();
+    Assert.assertEquals(cloned.getName(), "Jolly");
+    Assert.assertEquals(cloned.getCategory(), "Mountain sheep");
+}
+catch (CloneNotSupportedException e) { }
 ```
 
 Also you could use the magic method `__clone` to modify the cloning behavior.
@@ -527,42 +500,27 @@ Singleton pattern is actually considered an anti-pattern and overuse of it shoul
 **Programmatic Example**
 
 To create a singleton, make the constructor private, disable cloning, disable extension and create a static variable to house the instance
-```php
-final class President
-{
-    private static $instance;
+```java
+final class President {
+    private static President instance;
 
-    private function __construct()
-    {
-        // Hide the constructor
+    private President() {
     }
 
-    public static function getInstance(): President
-    {
-        if (!self::$instance) {
-            self::$instance = new self();
+    public static President getInstance() {
+        if(instance == null) {
+            instance = new President();
         }
-
-        return self::$instance;
-    }
-
-    private function __clone()
-    {
-        // Disable cloning
-    }
-
-    private function __wakeup()
-    {
-        // Disable unserialize
+        return instance;
     }
 }
 ```
 Then in order to use
-```php
-$president1 = President::getInstance();
-$president2 = President::getInstance();
+```java
+President president1 = President.getInstance();
+President president2 = President.getInstance();
 
-var_dump($president1 === $president2); // true
+Assert.assertEquals(president1, president2);
 ```
 
 Structural Design Patterns
@@ -600,71 +558,64 @@ Consider a game where there is a hunter and he hunts lions.
 
 First we have an interface `Lion` that all types of lions have to implement
 
-```php
-interface Lion
-{
-    public function roar();
+```java
+interface Lion {
+    void roar();
 }
 
-class AfricanLion implements Lion
-{
-    public function roar()
-    {
+class AfricanLion implements Lion {
+    @Override
+    public void roar() {
     }
 }
 
-class AsianLion implements Lion
-{
-    public function roar()
-    {
+class AsianLion implements Lion {
+    @Override
+    public void roar() {
     }
 }
 ```
 And hunter expects any implementation of `Lion` interface to hunt.
-```php
-class Hunter
-{
-    public function hunt(Lion $lion)
-    {
+```java
+class Hunter {
+    public void hunt(Lion lion) {
+
     }
 }
 ```
 
 Now let's say we have to add a `WildDog` in our game so that hunter can hunt that also. But we can't do that directly because dog has a different interface. To make it compatible for our hunter, we will have to create an adapter that is compatible
 
-```php
+```java
 // This needs to be added to the game
-class WildDog
-{
-    public function bark()
-    {
+class WildDog {
+    public void bark() {
+
     }
 }
 
 // Adapter around wild dog to make it compatible with our game
-class WildDogAdapter implements Lion
-{
-    protected $dog;
+class WildDogAdapter implements Lion {
+    protected WildDog dog;
 
-    public function __construct(WildDog $dog)
-    {
-        $this->dog = $dog;
+    public WildDogAdapter(WildDog dog) {
+        this.dog = dog;
     }
 
-    public function roar()
-    {
-        $this->dog->bark();
+    @Override
+    public void roar() {
+        dog.bark();
     }
 }
 ```
 And now the `WildDog` can be used in our game using `WildDogAdapter`.
 
-```php
-$wildDog = new WildDog();
-$wildDogAdapter = new WildDogAdapter($wildDog);
+```java
+WildDog wildDog = new WildDog();
+WildDogAdapter wildDogAdapter = new WildDogAdapter(wildDog);
 
-$hunter = new Hunter();
-$hunter->hunt($wildDogAdapter);
+Hunter hunter = new Hunter();
+hunter.hunt(wildDogAdapter);
 ```
 
 🚡 Bridge
@@ -684,82 +635,74 @@ Wikipedia says
 
 Translating our WebPage example from above. Here we have the `WebPage` hierarchy
 
-```php
-interface WebPage
-{
-    public function __construct(Theme $theme);
-    public function getContent();
+```java
+interface WebPage {
+    String getContent();
 }
 
-class About implements WebPage
-{
-    protected $theme;
+class About implements WebPage {
+    protected Theme theme;
 
-    public function __construct(Theme $theme)
-    {
-        $this->theme = $theme;
+    public About(Theme theme) {
+        this.theme = theme;
     }
 
-    public function getContent()
-    {
-        return "About page in " . $this->theme->getColor();
+    @Override
+    public String getContent() {
+        return "About page in " + this.theme.getColor();
     }
 }
 
-class Careers implements WebPage
-{
-    protected $theme;
+class Careers implements WebPage {
+    protected Theme theme;
 
-    public function __construct(Theme $theme)
-    {
-        $this->theme = $theme;
+    public Careers(Theme theme) {
+        this.theme = theme;
     }
 
-    public function getContent()
-    {
-        return "Careers page in " . $this->theme->getColor();
+    @Override
+    public String getContent() {
+        return "Careers page in " + this.theme.getColor();
     }
 }
 ```
 And the separate theme hierarchy
-```php
+```java
 
-interface Theme
-{
-    public function getColor();
+interface Theme {
+    String getColor();
 }
 
-class DarkTheme implements Theme
-{
-    public function getColor()
-    {
-        return 'Dark Black';
+class DarkTheme implements Theme {
+    @Override
+    public String getColor() {
+        return "Dark Black";
     }
 }
-class LightTheme implements Theme
-{
-    public function getColor()
-    {
-        return 'Off white';
+
+class LightTheme implements Theme {
+    @Override
+    public String getColor() {
+        return "Off white";
     }
 }
-class AquaTheme implements Theme
-{
-    public function getColor()
-    {
-        return 'Light blue';
+
+class AquaTheme implements Theme {
+    @Override
+    public String getColor() {
+        return "Light blue";
     }
 }
 ```
 And both the hierarchies
-```php
-$darkTheme = new DarkTheme();
+```java
+Theme darkTheme = new DarkTheme();
 
-$about = new About($darkTheme);
-$careers = new Careers($darkTheme);
+About about = new About(darkTheme);
+Careers careers = new Careers(darkTheme);
 
-echo $about->getContent(); // "About page in Dark Black";
-echo $careers->getContent(); // "Careers page in Dark Black";
+Assert.assertEquals(about.getContent(), "About page in Dark Black");
+Assert.assertEquals(careers.getContent(), "Careers page in Dark Black");
 ```
 
 🌿 Composite
@@ -778,121 +721,112 @@ Wikipedia says
 
 Taking our employees example from above. Here we have different employee types
 
-```php
-interface Employee
-{
-    public function __construct(string $name, float $salary);
-    public function getName(): string;
-    public function setSalary(float $salary);
-    public function getSalary(): float;
-    public function getRoles(): array;
+```java
+interface Employee {
+    String getName();
+    void setSalary(float salary);
+    float getSalary();
+    ArrayList<String> getRoles();
 }
 
-class Developer implements Employee
-{
-    protected $salary;
-    protected $name;
-    protected $roles;
-    
-    public function __construct(string $name, float $salary)
-    {
-        $this->name = $name;
-        $this->salary = $salary;
+class Developer implements Employee {
+    protected String name;
+    protected float salary;
+    protected ArrayList<String> roles = new ArrayList<>();
+
+    public Developer(String name, float salary) {
+        this.name = name;
+        this.salary = salary;
     }
 
-    public function getName(): string
-    {
-        return $this->name;
+    @Override
+    public String getName() {
+        return this.name;
     }
 
-    public function setSalary(float $salary)
-    {
-        $this->salary = $salary;
+    @Override
+    public void setSalary(float salary) {
+        this.salary = salary;
     }
 
-    public function getSalary(): float
-    {
-        return $this->salary;
+    @Override
+    public float getSalary() {
+        return this.salary;
     }
 
-    public function getRoles(): array
-    {
-        return $this->roles;
+    @Override
+    public ArrayList<String> getRoles() {
+        return this.roles;
     }
 }
 
-class Designer implements Employee
-{
-    protected $salary;
-    protected $name;
-    protected $roles;
+class Designer implements Employee {
+    protected String name;
+    protected float salary;
+    protected ArrayList<String> roles = new ArrayList<>();
 
-    public function __construct(string $name, float $salary)
-    {
-        $this->name = $name;
-        $this->salary = $salary;
+    public Designer(String name, float salary) {
+        this.name = name;
+        this.salary = salary;
     }
 
-    public function getName(): string
-    {
-        return $this->name;
+    @Override
+    public String getName() {
+        return this.name;
     }
 
-    public function setSalary(float $salary)
-    {
-        $this->salary = $salary;
+    @Override
+    public void setSalary(float salary) {
+        this.salary = salary;
     }
 
-    public function getSalary(): float
-    {
-        return $this->salary;
+    @Override
+    public float getSalary() {
+        return this.salary;
     }
 
-    public function getRoles(): array
-    {
-        return $this->roles;
+    @Override
+    public ArrayList<String> getRoles() {
+        return this.roles;
     }
 }
 ```
 
 Then we have an organization which consists of several different types of employees
 
-```php
-class Organization
-{
-    protected $employees;
+```java
+class Organization {
+    protected ArrayList<Employee> employees = new ArrayList<>();
 
-    public function addEmployee(Employee $employee)
-    {
-        $this->employees[] = $employee;
+    public void addEmployee(Employee employee) {
+        this.employees.add(employee);
     }
 
-    public function getNetSalaries(): float
-    {
-        $netSalary = 0;
+    public float getNetSalaries() {
+        float netSalary = 0f;
 
-        foreach ($this->employees as $employee) {
-            $netSalary += $employee->getSalary();
+        for(Employee employee : employees) {
+            netSalary += employee.getSalary();
         }
 
-        return $netSalary;
+        return netSalary;
     }
 }
 ```
 
 And then it can be used as
 
-```php
+```java
 // Prepare the employees
-$john = new Developer('John Doe', 12000);
-$jane = new Designer('Jane Doe', 15000);
+Employee john = new Developer("John Doe", 12000);
+Employee jane = new Designer("Jane Doe", 15000);
 
 // Add them to organization
-$organization = new Organization();
-$organization->addEmployee($john);
-$organization->addEmployee($jane);
+Organization organization = new Organization();
+organization.addEmployee(john);
+organization.addEmployee(jane);
 
-echo "Net salaries: " . $organization->getNetSalaries(); // Net Salaries: 27000
+Assert.assertEquals(organization.getNetSalaries(), 27000f, 0.0f);
 ```
 
 ☕ Decorator
@@ -1625,7 +1559,7 @@ Here is the simplest example of a chat room (i.e. mediator) with users (i.e. col
 First of all, we have the mediator i.e. the chat room
 
 ```php
-interface ChatRoomMediator 
+interface ChatRoomMediator
 {
     public function showMessage(User $user, string $message);
 }
