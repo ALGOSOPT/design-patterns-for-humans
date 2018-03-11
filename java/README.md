@@ -846,107 +846,99 @@ Wikipedia says
 
 Lets take coffee for example. First of all we have a simple coffee implementing the coffee interface
 
-```php
-interface Coffee
-{
-    public function getCost();
-    public function getDescription();
+```java
+interface Coffee {
+    int getCost();
+    String getDescription();
 }
 
-class SimpleCoffee implements Coffee
-{
-    public function getCost()
-    {
+class SimpleCoffee implements Coffee {
+    @Override
+    public int getCost() {
         return 10;
     }
 
-    public function getDescription()
-    {
-        return 'Simple coffee';
+    @Override
+    public String getDescription() {
+        return "Simple coffee";
     }
 }
 ```
 We want to make the code extensible to allow options to modify it if required. Lets make some add-ons (decorators)
-```php
-class MilkCoffee implements Coffee
-{
-    protected $coffee;
+```java
+class MilkCoffee implements Coffee {
+    protected Coffee coffee;
 
-    public function __construct(Coffee $coffee)
-    {
-        $this->coffee = $coffee;
+    public MilkCoffee(Coffee coffee) {
+        this.coffee = coffee;
     }
 
-    public function getCost()
-    {
-        return $this->coffee->getCost() + 2;
+    @Override
+    public int getCost() {
+        return coffee.getCost() + 2;
     }
 
-    public function getDescription()
-    {
-        return $this->coffee->getDescription() . ', milk';
+    @Override
+    public String getDescription() {
+        return coffee.getDescription() + ", milk";
     }
 }
 
-class WhipCoffee implements Coffee
-{
-    protected $coffee;
+class WhipCoffee implements Coffee {
+    protected Coffee coffee;
 
-    public function __construct(Coffee $coffee)
-    {
-        $this->coffee = $coffee;
+    public WhipCoffee(Coffee coffee) {
+        this.coffee = coffee;
     }
 
-    public function getCost()
-    {
-        return $this->coffee->getCost() + 5;
+    @Override
+    public int getCost() {
+        return coffee.getCost() + 5;
     }
 
-    public function getDescription()
-    {
-        return $this->coffee->getDescription() . ', whip';
+    @Override
+    public String getDescription() {
+        return coffee.getDescription() + ", whip";
     }
 }
 
-class VanillaCoffee implements Coffee
-{
-    protected $coffee;
+class VanillaCoffee implements Coffee {
+    protected Coffee coffee;
 
-    public function __construct(Coffee $coffee)
-    {
-        $this->coffee = $coffee;
+    public VanillaCoffee(Coffee coffee) {
+        this.coffee = coffee;
     }
 
-    public function getCost()
-    {
-        return $this->coffee->getCost() + 3;
+    @Override
+    public int getCost() {
+        return coffee.getCost() + 3;
     }
 
-    public function getDescription()
-    {
-        return $this->coffee->getDescription() . ', vanilla';
+    @Override
+    public String getDescription() {
+        return coffee.getDescription() + ", vanilla";
     }
 }
 ```
 
 Lets make a coffee now
 
-```php
-$someCoffee = new SimpleCoffee();
-echo $someCoffee->getCost(); // 10
-echo $someCoffee->getDescription(); // Simple Coffee
+```java
+Coffee someCoffee = new SimpleCoffee();
+Assert.assertEquals(someCoffee.getCost(), 10);
+Assert.assertEquals(someCoffee.getDescription(), "Simple coffee");
 
-$someCoffee = new MilkCoffee($someCoffee);
-echo $someCoffee->getCost(); // 12
-echo $someCoffee->getDescription(); // Simple Coffee, milk
+someCoffee = new MilkCoffee(someCoffee);
+Assert.assertEquals(someCoffee.getCost(), 12);
+Assert.assertEquals(someCoffee.getDescription(), "Simple coffee, milk");
 
-$someCoffee = new WhipCoffee($someCoffee);
-echo $someCoffee->getCost(); // 17
-echo $someCoffee->getDescription(); // Simple Coffee, milk, whip
+someCoffee = new WhipCoffee(someCoffee);
+Assert.assertEquals(someCoffee.getCost(), 17);
+Assert.assertEquals(someCoffee.getDescription(), "Simple coffee, milk, whip");
 
-$someCoffee = new VanillaCoffee($someCoffee);
-echo $someCoffee->getCost(); // 20
-echo $someCoffee->getDescription(); // Simple Coffee, milk, whip, vanilla
+someCoffee = new VanillaCoffee(someCoffee);
+Assert.assertEquals(someCoffee.getCost(), 20);
+Assert.assertEquals(someCoffee.getDescription(), "Simple coffee, milk, whip, vanilla");
 ```
 
 📦 Facade
@@ -965,77 +957,69 @@ Wikipedia says
 
 Taking our computer example from above. Here we have the computer class
 
-```php
-class Computer
-{
-    public function getElectricShock()
-    {
-        echo "Ouch!";
+```java
+class Computer {
+    public String getElectricShock() {
+        return "Ouch!";
     }
 
-    public function makeSound()
-    {
-        echo "Beep beep!";
+    public String makeSound() {
+        return "Beep beep!";
     }
 
-    public function showLoadingScreen()
-    {
-        echo "Loading..";
+    public String showLoadingScreen() {
+        return "Loading..";
     }
 
-    public function bam()
-    {
-        echo "Ready to be used!";
+    public String bam() {
+        return "Ready to be used!";
     }
 
-    public function closeEverything()
-    {
-        echo "Bup bup bup buzzzz!";
+    public String closeEverything() {
+        return "Bup bup bup buzzzz!";
     }
 
-    public function sooth()
-    {
-        echo "Zzzzz";
+    public String sooth() {
+        return "Zzzzz";
     }
 
-    public function pullCurrent()
-    {
-        echo "Haaah!";
+    public String pullCurrent() {
+        return "Haaah!";
     }
-}
 ```
 Here we have the facade
-```php
-class ComputerFacade
-{
-    protected $computer;
+```java
+class ComputerFacade {
+    protected Computer computer;
 
-    public function __construct(Computer $computer)
-    {
-        $this->computer = $computer;
+    public ComputerFacade(Computer computer) {
+        this.computer = computer;
     }
 
-    public function turnOn()
-    {
-        $this->computer->getElectricShock();
-        $this->computer->makeSound();
-        $this->computer->showLoadingScreen();
-        $this->computer->bam();
+    public String turnOn() {
+        StringBuilder on = new StringBuilder();
+        on.append(computer.getElectricShock());
+        on.append(computer.makeSound());
+        on.append(computer.showLoadingScreen());
+        on.append(computer.bam());
+        return on.toString();
     }
 
-    public function turnOff()
-    {
-        $this->computer->closeEverything();
-        $this->computer->pullCurrent();
-        $this->computer->sooth();
+    public String turnOff() {
+        StringBuilder off = new StringBuilder();
+        off.append(computer.closeEverything());
+        off.append(computer.pullCurrent());
+        off.append(computer.sooth());
+        return off.toString();
     }
 }
 ```
 Now to use the facade
-```php
-$computer = new ComputerFacade(new Computer());
-$computer->turnOn(); // Ouch! Beep beep! Loading.. Ready to be used!
-$computer->turnOff(); // Bup bup buzzz! Haah! Zzzzz
+```java
+ComputerFacade computer = new ComputerFacade(new Computer());
+
+Assert.assertEquals(computer.turnOn(), "Ouch!Beep beep!Loading..Ready to be used!");
+Assert.assertEquals(computer.turnOff(), "Bup bup bup buzzzz!Haaah!Zzzzz");
 ```
 
 🍃 Flyweight
@@ -1054,66 +1038,61 @@ Wikipedia says
 
 Translating our tea example from above. First of all we have tea types and tea maker
 
-```php
+```java
 // Anything that will be cached is flyweight.
 // Types of tea here will be flyweights.
-class KarakTea
-{
+class KarakTea {
+
 }
 
 // Acts as a factory and saves the tea
-class TeaMaker
-{
-    protected $availableTea = [];
+class TeaMaker {
+    protected Map<String, KarakTea> availableTea = new HashMap<>();
 
-    public function make($preference)
-    {
-        if (empty($this->availableTea[$preference])) {
-            $this->availableTea[$preference] = new KarakTea();
+    public KarakTea make(String preference) {
+        if(availableTea.get(preference) == null) {
+            availableTea.put(preference, new KarakTea());
         }
-
-        return $this->availableTea[$preference];
+        return availableTea.get(preference);
     }
 }
 ```
 
 Then we have the `TeaShop` which takes orders and serves them
 
-```php
-class TeaShop
-{
-    protected $orders;
-    protected $teaMaker;
+```java
+class TeahShop {
+    protected KarakTea[] orders = new KarakTea[10];
+    protected TeaMaker teaMaker;
 
-    public function __construct(TeaMaker $teaMaker)
-    {
-        $this->teaMaker = $teaMaker;
+    public TeahShop(TeaMaker teaMaker) {
+        this.teaMaker = teaMaker;
     }
 
-    public function takeOrder(string $teaType, int $table)
-    {
-        $this->orders[$table] = $this->teaMaker->make($teaType);
+    public void takeOrder(String teaType, int table) {
+        orders[table] = teaMaker.make(teaType);
     }
 
-    public function serve()
-    {
-        foreach ($this->orders as $table => $tea) {
-            echo "Serving tea to table# " . $table;
+    public void serve() {
+        for(int table = 1; table<10; table++) {
+            if(orders[table] != null) {
+                System.out.println("Serving tea to table# " + table);
+            }
         }
     }
 }
 ```
 And it can be used as below
 
-```php
-$teaMaker = new TeaMaker();
-$shop = new TeaShop($teaMaker);
+```java
+TeaMaker teaMaker = new TeaMaker();
+TeahShop shop = new TeahShop(teaMaker);
 
-$shop->takeOrder('less sugar', 1);
-$shop->takeOrder('more milk', 2);
-$shop->takeOrder('without sugar', 5);
+shop.takeOrder("less sugar", 1);
+shop.takeOrder("more milk", 2);
+shop.takeOrder("without sugar", 5);
 
-$shop->serve();
+shop.serve();
 // Serving tea to table# 1
 // Serving tea to table# 2
 // Serving tea to table# 5
@@ -1134,64 +1113,60 @@ Wikipedia says
 
 Taking our security door example from above. Firstly we have the door interface and an implementation of door
 
-```php
-interface Door
-{
-    public function open();
-    public function close();
+```java
+interface Door {
+    String open();
+    String close();
 }
 
-class LabDoor implements Door
-{
-    public function open()
-    {
-        echo "Opening lab door";
+class LabDoor implements Door {
+    @Override
+    public String open() {
+        return "Opening lab door";
     }
 
-    public function close()
-    {
-        echo "Closing the lab door";
+    @Override
+    public String close() {
+        return "Closing the lab door";
     }
 }
 ```
 Then we have a proxy to secure any doors that we want
-```php
-class SecuredDoor
-{
-    protected $door;
+```java
+class SecureDoor {
+    protected Door door;
 
-    public function __construct(Door $door)
-    {
-        $this->door = $door;
+    public SecureDoor(Door door) {
+        this.door = door;
     }
 
-    public function open($password)
-    {
-        if ($this->authenticate($password)) {
-            $this->door->open();
-        } else {
-            echo "Big no! It ain't possible.";
+    public String open(String password) {
+        if(authenticate(password) == true) {
+            return door.open();
+        }
+        else {
+            return "Big no! It ain't possible.";
         }
     }
 
-    public function authenticate($password)
-    {
-        return $password === '$ecr@t';
+    private boolean authenticate(String password) {
+        return password.equals("$ecr@t");
     }
 
-    public function close()
-    {
-        $this->door->close();
+    public String close() {
+        return door.close();
     }
 }
 ```
 And here is how it can be used
-```php
-$door = new SecuredDoor(new LabDoor());
-$door->open('invalid'); // Big no! It ain't possible.
+```java
+SecureDoor door = new SecureDoor(new LabDoor());
 
-$door->open('$ecr@t'); // Opening lab door
-$door->close(); // Closing lab door
+Assert.assertEquals(door.open("invalid"), "Big no! It ain't possible.");
+Assert.assertEquals(door.open("$ecr@t"), "Opening lab door");
+
+Assert.assertEquals(door.close(), "Closing the lab door");
+
 ```
 Yet another example would be some sort of data-mapper implementation. For example, I recently made an ODM (Object Data Mapper) for MongoDB using this pattern where I wrote a proxy around mongo classes while utilizing the magic method `__call()`. All the method calls were proxied to the original mongo class and result retrieved was returned as it is but in case of `find` or `findOne` data was mapped to the required class objects and the object was returned instead of `Cursor`.
 
@@ -1231,69 +1206,68 @@ Wikipedia says
 
 Translating our account example above. First of all we have a base account having the logic for chaining the accounts together and some accounts
 
-```php
-abstract class Account
-{
-    protected $successor;
-    protected $balance;
+```java
+abstract class Account {
+    protected Account successor;
+    protected float balance;
 
-    public function setNext(Account $account)
-    {
-        $this->successor = $account;
+    public Account(float balance) {
+        this.balance = balance;
     }
 
-    public function pay(float $amountToPay)
-    {
-        if ($this->canPay($amountToPay)) {
-            echo sprintf('Paid %s using %s' . PHP_EOL, $amountToPay, get_called_class());
-        } elseif ($this->successor) {
-            echo sprintf('Cannot pay using %s. Proceeding ..' . PHP_EOL, get_called_class());
-            $this->successor->pay($amountToPay);
-        } else {
-            throw new Exception('None of the accounts have enough balance');
+    public void setNext(Account account) {
+        successor = account;
+    }
+
+    public void pay(float amountToPay) throws Exception {
+        if(canPay(amountToPay) == true) {
+            System.out.println(String.format("Paid %.0f using %s", amountToPay, getClass().getSimpleName()));
+        }
+        else if(successor != null) {
+            System.out.println(String.format("Cannot pay using %s. Proceeding ..", getClass().getSimpleName()));
+            successor.pay(amountToPay);
+        }
+        else {
+            throw new Exception("None of the accounts have enough balance");
         }
     }
 
-    public function canPay($amount): bool
-    {
-        return $this->balance >= $amount;
+    private boolean canPay(float amount) {
+        return balance >= amount;
     }
 }
 
-class Bank extends Account
-{
-    protected $balance;
+class Bank extends Account {
+    protected float balance;
 
-    public function __construct(float $balance)
-    {
-        $this->balance = $balance;
+    public Bank(float balance) {
+        super(balance);
+        this.balance = balance;
     }
 }
 
-class Paypal extends Account
-{
-    protected $balance;
+class Paypal extends Account {
+    protected float balance;
 
-    public function __construct(float $balance)
-    {
-        $this->balance = $balance;
+    public Paypal(float balance) {
+        super(balance);
+        this.balance = balance;
     }
 }
 
-class Bitcoin extends Account
-{
-    protected $balance;
+class Bitcoin extends Account {
+    protected float balance;
 
-    public function __construct(float $balance)
-    {
-        $this->balance = $balance;
+    public Bitcoin(float balance) {
+        super(balance);
+        this.balance = balance;
     }
 }
 ```
 
 Now let's prepare the chain using the links defined above (i.e. Bank, Paypal, Bitcoin)
 
-```php
+```java
 // Let's prepare a chain like below
 //      $bank->$paypal->$bitcoin
 //
@@ -1301,16 +1275,17 @@ Now let's prepare the chain using the links defined above (i.e. Bank, Paypal, Bi
 //      If bank can't pay then paypal
 //      If paypal can't pay then bit coin
 
-$bank = new Bank(100);          // Bank with balance 100
-$paypal = new Paypal(200);      // Paypal with balance 200
-$bitcoin = new Bitcoin(300);    // Bitcoin with balance 300
+Bank bank = new Bank(100);
+Paypal paypal = new Paypal(200);
+Bitcoin bitcoin = new Bitcoin(300);
 
-$bank->setNext($paypal);
-$paypal->setNext($bitcoin);
+bank.setNext(paypal);
+paypal.setNext(bitcoin);
 
-// Let's try to pay using the first priority i.e. bank
-$bank->pay(259);
-
+try {
+    bank.pay((float) 259.0);
+}
+catch(Exception e) {}
 // Output will be
 // ==============
 // Cannot pay using bank. Proceeding ..
@@ -1334,102 +1309,92 @@ Wikipedia says
 **Programmatic Example**
 
 First of all we have the receiver that has the implementation of every action that could be performed
-```php
+```java
 // Receiver
-class Bulb
-{
-    public function turnOn()
-    {
-        echo "Bulb has been lit";
+class Bulb {
+    public String turnOn() {
+        return "Bulb has been lit";
     }
 
-    public function turnOff()
-    {
-        echo "Darkness!";
+    public String turnOff() {
+        return "Darkness!";
     }
 }
 ```
 then we have an interface that each of the commands are going to implement and then we have a set of commands
-```php
-interface Command
-{
-    public function execute();
-    public function undo();
-    public function redo();
+```java
+interface Command {
+    String execute();
+    String undo();
+    String redo();
 }
 
 // Command
-class TurnOn implements Command
-{
-    protected $bulb;
+class TurnOn implements Command {
+    protected Bulb bulb;
 
-    public function __construct(Bulb $bulb)
-    {
-        $this->bulb = $bulb;
+    public TurnOn(Bulb bulb) {
+        this.bulb = bulb;
     }
 
-    public function execute()
-    {
-        $this->bulb->turnOn();
+    @Override
+    public String execute() {
+        return bulb.turnOn();
     }
 
-    public function undo()
-    {
-        $this->bulb->turnOff();
+    @Override
+    public String undo() {
+        return bulb.turnOff();
     }
 
-    public function redo()
-    {
-        $this->execute();
+    @Override
+    public String redo() {
+        return execute();
     }
 }
 
-class TurnOff implements Command
-{
-    protected $bulb;
+class TurnOff implements Command {
+    protected Bulb bulb;
 
-    public function __construct(Bulb $bulb)
-    {
-        $this->bulb = $bulb;
+    public TurnOff(Bulb bulb) {
+        this.bulb = bulb;
     }
 
-    public function execute()
-    {
-        $this->bulb->turnOff();
+    @Override
+    public String execute() {
+        return bulb.turnOff();
     }
 
-    public function undo()
-    {
-        $this->bulb->turnOn();
+    @Override
+    public String undo() {
+        return bulb.turnOn();
     }
 
-    public function redo()
-    {
-        $this->execute();
+    @Override
+    public String redo() {
+        return execute();
     }
 }
 ```
 Then we have an `Invoker` with whom the client will interact to process any commands
-```php
+```java
 // Invoker
-class RemoteControl
-{
-    public function submit(Command $command)
-    {
-        $command->execute();
+class RemoteControl {
+    public String submit(Command command) {
+        return command.execute();
     }
 }
 ```
 Finally let's see how we can use it in our client
-```php
-$bulb = new Bulb();
+```java
+Bulb bulb = new Bulb();
 
-$turnOn = new TurnOn($bulb);
-$turnOff = new TurnOff($bulb);
+TurnOn turnOn = new TurnOn(bulb);
+TurnOff turnOff = new TurnOff(bulb);
 
-$remote = new RemoteControl();
-$remote->submit($turnOn); // Bulb has been lit!
-$remote->submit($turnOff); // Darkness!
+RemoteControl remote = new RemoteControl();
+Assert.assertEquals(remote.submit(turnOn), "Bulb has been lit");
+Assert.assertEquals(remote.submit(turnOff), "Darkness!");
 ```
 
 Command pattern can also be used to implement a transaction based system. Where you keep maintaining the history of commands as soon as you execute them. If the final command is successfully executed, all good otherwise just iterate through the history and keep executing the `undo` on all the executed commands.
