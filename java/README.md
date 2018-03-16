@@ -1415,94 +1415,81 @@ Wikipedia says
 
 In PHP it is quite easy to implement using SPL (Standard PHP Library). Translating our radio stations example from above. First of all we have `RadioStation`
 
-```php
-class RadioStation
-{
-    protected $frequency;
+```java
+class RadioStation {
+    protected float frequency;
 
-    public function __construct(float $frequency)
-    {
-        $this->frequency = $frequency;
+    public RadioStation(float frequency) {
+        this.frequency = frequency;
     }
 
-    public function getFrequency(): float
-    {
-        return $this->frequency;
+    public float getFrequency() {
+        return frequency;
     }
 }
 ```
 Then we have our iterator
 
-```php
-use Countable;
-use Iterator;
+```java
+interface Iterator {
+    boolean hasNext();
+    RadioStation next();
+}
 
-class StationList implements Countable, Iterator
-{
-    /** @var RadioStation[] $stations */
-    protected $stations = [];
 
-    /** @var int $counter */
-    protected $counter;
+interface Container {
+    Iterator getIterator();
+}
 
-    public function addStation(RadioStation $station)
-    {
-        $this->stations[] = $station;
+class StationList implements Container {
+
+    protected List<RadioStation> stations = new ArrayList<>();
+
+    @Override
+    public Iterator getIterator() {
+        return new StationIterator();
     }
 
-    public function removeStation(RadioStation $toRemove)
-    {
-        $toRemoveFrequency = $toRemove->getFrequency();
-        $this->stations = array_filter($this->stations, function (RadioStation $station) use ($toRemoveFrequency) {
-            return $station->getFrequency() !== $toRemoveFrequency;
-        });
+    private class StationIterator implements Iterator {
+
+        int index;
+
+        @Override
+        public boolean hasNext() {
+            if(index < stations.size()) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public RadioStation next() {
+            if(this.hasNext()) {
+                return stations.get(index++);
+            }
+            return null;
+        }
     }
 
-    public function count(): int
-    {
-        return count($this->stations);
-    }
-
-    public function current(): RadioStation
-    {
-        return $this->stations[$this->counter];
-    }
-
-    public function key()
-    {
-        return $this->counter;
-    }
-
-    public function next()
-    {
-        $this->counter++;
-    }
-
-    public function rewind()
-    {
-        $this->counter = 0;
-    }
-
-    public function valid(): bool
-    {
-        return isset($this->stations[$this->counter]);
+    public void addStation(RadioStation station) {
+        stations.add(station);
     }
 }
 ```
 And then it can be used as
-```php
-$stationList = new StationList();
+```java
+float[] stations = {89f, 101f, 102f, 103.2f};
 
-$stationList->addStation(new RadioStation(89));
-$stationList->addStation(new RadioStation(101));
-$stationList->addStation(new RadioStation(102));
-$stationList->addStation(new RadioStation(103.2));
+StationList stationList = new StationList();
 
-foreach($stationList as $station) {
-    echo $station->getFrequency() . PHP_EOL;
+for(int i=0; i<4; i++) {
+    stationList.addStation(new RadioStation(stations[i]));
 }
 
-$stationList->removeStation(new RadioStation(89)); // Will remove station 89
+int index = 0;
+for(Iterator iter = stationList.getIterator(); iter.hasNext(); ) {
+    Assert.assertEquals(iter.next().getFrequency(), stations[index++], 0.0f);
+}
 ```
 
 👽 Mediator
@@ -1523,58 +1510,57 @@ Here is the simplest example of a chat room (i.e. mediator) with users (i.e. col
 
 First of all, we have the mediator i.e. the chat room
 
-```php
-interface ChatRoomMediator
-{
-    public function showMessage(User $user, string $message);
+```java
+interface ChatRoomMediator {
+    void showMessage(User user, String message);
 }
 
-// Mediator
-class ChatRoom implements ChatRoomMediator
-{
-    public function showMessage(User $user, string $message)
-    {
-        $time = date('M d, y H:i');
-        $sender = $user->getName();
+class ChatRoom implements ChatRoomMediator {
+    @Override
+    public void showMessage(User user, String message) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Calendar cal = Calendar.getInstance();
 
-        echo $time . '[' . $sender . ']:' . $message;
+        String sender = user.getName();
+
+        System.out.println(cal.getTime() + "[ " + sender + " ]: " + message);
     }
 }
 ```
 
 Then we have our users i.e. colleagues
-```php
+```java
 class User {
-    protected $name;
-    protected $chatMediator;
+    protected String name;
+    protected ChatRoomMediator chatMediator;
 
-    public function __construct(string $name, ChatRoomMediator $chatMediator) {
-        $this->name = $name;
-        $this->chatMediator = $chatMediator;
+    public User(String name, ChatRoomMediator chatMediator) {
+        this.name = name;
+        this.chatMediator = chatMediator;
     }
 
-    public function getName() {
-        return $this->name;
+    public String getName() {
+        return this.name;
     }
 
-    public function send($message) {
-        $this->chatMediator->showMessage($this, $message);
+    public void send(String message) {
+        this.chatMediator.showMessage(this, message);
     }
 }
 ```
 And the usage
-```php
-$mediator = new ChatRoom();
+```java
+ChatRoomMediator mediator = new ChatRoom();
 
-$john = new User('John Doe', $mediator);
-$jane = new User('Jane Doe', $mediator);
+User john = new User("Jone Doe", mediator);
+User jane = new User("Jane Doe", mediator);
 
-$john->send('Hi there!');
-$jane->send('Hey!');
+john.send("Hi there!");
+jane.send("Hey!");
 
 // Output will be
-// Feb 14, 10:58 [John]: Hi there!
-// Feb 14, 10:58 [Jane]: Hey!
+// Fri Mar 16 21:11:49 KST 2018[ Jone Doe ]: Hi there!
+// Fri Mar 16 21:11:49 KST 2018[ Jane Doe ]: Hey!
 ```
 
 💾 Memento
@@ -1596,74 +1582,61 @@ Lets take an example of text editor which keeps saving the state from time to ti
 
 First of all we have our memento object that will be able to hold the editor state
 
-```php
-class EditorMemento
-{
-    protected $content;
+```java
+class EditorMemento {
+    protected String content;
 
-    public function __construct(string $content)
-    {
-        $this->content = $content;
+    public EditorMemento(String content) {
+        this.content = content;
     }
 
-    public function getContent()
-    {
-        return $this->content;
+    public String getContent() {
+        return content;
     }
 }
 ```
 
 Then we have our editor i.e. originator that is going to use memento object
 
-```php
-class Editor
-{
-    protected $content = '';
+```java
+class Editor {
+    protected StringBuilder content = new StringBuilder();
 
-    public function type(string $words)
-    {
-        $this->content = $this->content . ' ' . $words;
+    public void type(String words) {
+        content.append(words + " ");
     }
 
-    public function getContent()
-    {
-        return $this->content;
+    public String getContent() {
+        return this.content.toString();
     }
 
-    public function save()
-    {
-        return new EditorMemento($this->content);
+    public EditorMemento save() {
+        return new EditorMemento(this.content.toString());
     }
 
-    public function restore(EditorMemento $memento)
-    {
-        $this->content = $memento->getContent();
+    public void restore(EditorMemento memento) {
+        this.content = new StringBuilder(memento.getContent());
     }
 }
 ```
 
 And then it can be used as
 
-```php
-$editor = new Editor();
+```java
+Editor editor = new Editor();
 
-// Type some stuff
-$editor->type('This is the first sentence.');
-$editor->type('This is second.');
+editor.type("This is the first sentence.");
+editor.type("This is second.");
 
-// Save the state to restore to : This is the first sentence. This is second.
-$saved = $editor->save();
+EditorMemento saved = editor.save();
 
-// Type some more
-$editor->type('And this is third.');
+editor.type("And this is third.");
 
-// Output: Content before Saving
-echo $editor->getContent(); // This is the first sentence. This is second. And this is third.
+Assert.assertEquals(editor.getContent(), "This is the first sentence. This is second. And this is third. ");
 
-// Restoring to last saved state
-$editor->restore($saved);
+editor.restore(saved);
 
-$editor->getContent(); // This is the first sentence. This is second.
+Assert.assertEquals(editor.getContent(), "This is the first sentence. This is second. ");
 ```
 
 😎 Observer
